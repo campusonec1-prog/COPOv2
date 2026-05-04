@@ -15,8 +15,6 @@
     />
     <style>
       body {
-        background-image: url("/images/cahcet.jpg");
-        /* Relative path */
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -26,7 +24,7 @@
     </style>
   </head>
 
-  <body>
+  <body th:style="'background-image: url(' + @{/images/cahcet.jpg} + ');'">
     <div class="container mt-5">
       <div class="row justify-content-center">
         <div class="col-md-6">
@@ -121,7 +119,7 @@
                     <div class="alert alert-info" role="alert">
                       <i class="fas fa-user-plus me-2"></i>
                       <strong>Not a student?</strong>
-                      <a href="/register/student" class="alert-link fw-bold"
+                      <a th:href="@{/register/student}" class="alert-link fw-bold"
                         >Register as New Student</a
                       >
                     </div>

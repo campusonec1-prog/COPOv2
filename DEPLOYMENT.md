@@ -164,7 +164,8 @@ After deployment, verify the app is running:
 
 ```bash
 # Health endpoint
-curl http://localhost:9091/actuator/health
+curl http://localhost:9091/copo/actuator/health
+
 
 # Expected response:
 # {"status":"UP"}
