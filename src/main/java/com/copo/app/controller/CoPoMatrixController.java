@@ -81,10 +81,12 @@ public class CoPoMatrixController {
         	service.parseAndSaveExcel(file, subjectCode.trim(), subjectName.trim());
             redirectAttributes.addFlashAttribute("success", "CO-PO matrix uploaded successfully.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Upload failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Upload failed. Please try again.");
         }
         return "redirect:/copo/form"; // Adjust this redirect as needed
     }
 
 
 }
+
+

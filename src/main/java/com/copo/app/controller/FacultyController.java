@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/faculty")
@@ -38,7 +39,7 @@ public class FacultyController {
             return "faculty/list";
         } catch (Exception e) {
             logger.error("Error fetching faculty list", e);
-            model.addAttribute("error", "Unable to load faculty list. Error: "+e.getMessage());
+            model.addAttribute("error", "Unable to load faculty list..");
             return "error";
         }
     }
@@ -54,7 +55,7 @@ public class FacultyController {
             return "login/facultydashboard";
         } catch (Exception e) {
             logger.error("Error loading faculty home", e);
-            model.addAttribute("error", "Unable to load dashboard.Error: "+e.getMessage());
+            model.addAttribute("error", "Unable to load dashboard..");
             return "error";
         }
     }
@@ -69,7 +70,7 @@ public class FacultyController {
             return "faculty/create";
         } catch (Exception e) {
             logger.error("Error displaying create faculty form", e);
-            model.addAttribute("error", "Unable to load form. Error: "+e.getMessage());
+            model.addAttribute("error", "Unable to load form..");
             return "error";
         }
     }
@@ -82,7 +83,7 @@ public class FacultyController {
             redirectAttributes.addFlashAttribute("success", "Faculty created successfully!");
         } catch (Exception e) {
             logger.error("Error creating faculty", e);
-            redirectAttributes.addFlashAttribute("error", "Failed to create faculty: Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to create faculty:.");
         }
         return "redirect:/faculty";
     }
@@ -99,7 +100,7 @@ public class FacultyController {
             return "faculty/edit";
         } catch (Exception e) {
             logger.error("Error loading edit form for faculty ID: {}", id, e);
-            model.addAttribute("error", "Unable to load edit form. Error: "+e.getMessage());
+            model.addAttribute("error", "Unable to load edit form..");
             return "error";
         }
     }
@@ -112,20 +113,20 @@ public class FacultyController {
             redirectAttributes.addFlashAttribute("success", "Faculty updated successfully!");
         } catch (Exception e) {
             logger.error("Error updating faculty with ID: {}", id, e);
-            redirectAttributes.addFlashAttribute("error", "Failed to update faculty: Erro : " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to update faculty:.");
         }
         return "redirect:/faculty";
     }
 
     // Delete a faculty member
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteFaculty(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             facultyService.deleteFaculty(id);
             redirectAttributes.addFlashAttribute("success", "Faculty deleted successfully!");
         } catch (Exception e) {
             logger.error("Error deleting faculty with ID: {}", id, e);
-            redirectAttributes.addFlashAttribute("error", "Failed to delete faculty: Error : " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to delete faculty:.");
         }
         return "redirect:/faculty";
     }
@@ -154,21 +155,25 @@ public class FacultyController {
 
         } catch (Exception e) {
             logger.error("Error uploading faculty CSV", e);
-            redirectAttributes.addFlashAttribute("error", "Error uploading faculty data: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error uploading faculty data. Please try again.");
         }
         return "redirect:/faculty";
     }
 
-    // Initialize default passwords for all faculty
+    // Initialize default passwords for all faculty — faculty session required
     @GetMapping("/init-passwords")
-    public String initializeDefaultPasswords(RedirectAttributes redirectAttributes) {
+    public String initializeDefaultPasswords(HttpSession session, RedirectAttributes redirectAttributes) {
+        String role = (String) session.getAttribute("role");
+        if (!"faculty".equals(role)) {
+            return "redirect:/login?error=unauthorized";
+        }
         try {
             facultyService.setDefaultPasswordForAllFaculty();
-            redirectAttributes.addFlashAttribute("success", "Default passwords (5106) have been set for all faculty members!");
+            redirectAttributes.addFlashAttribute("success", "Default passwords have been set for all faculty members!");
             logger.info("Default passwords initialized for all faculty");
         } catch (Exception e) {
             logger.error("Error initializing default passwords", e);
-            redirectAttributes.addFlashAttribute("error", "Failed to initialize default passwords: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to initialize default passwords. Please try again.");
         }
         return "redirect:/faculty";
     }
@@ -185,47 +190,12 @@ public class FacultyController {
             }
         } catch (Exception e) {
             logger.error("Error resetting password for faculty ID: {}", id, e);
-            redirectAttributes.addFlashAttribute("error", "Failed to reset password: " + e.getMessage());
-        }
-        return "redirect:/faculty";
-    }
-
-    // Debug endpoint to check faculty data and set default passwords
-    @GetMapping("/debug-setup")
-    public String debugFacultySetup(RedirectAttributes redirectAttributes) {
-        try {
-            List<Faculty> allFaculty = facultyService.getAllFaculty();
-            StringBuilder debugInfo = new StringBuilder();
-            debugInfo.append("Total Faculty: ").append(allFaculty.size()).append("\n");
-            
-            int updatedCount = 0;
-            for (Faculty faculty : allFaculty) {
-                debugInfo.append("Faculty: ").append(faculty.getFacultycode())
-                        .append(" - ").append(faculty.getName())
-                        .append(" - Password: ").append(
-                            faculty.getPassword() != null && !faculty.getPassword().isEmpty() 
-                            ? "SET" : "NOT SET"
-                        ).append("\n");
-                
-                // Set password if not set
-                if (faculty.getPassword() == null || faculty.getPassword().trim().isEmpty()) {
-                    boolean success = facultyService.setFacultyPassword(faculty.getId(), "5106");
-                    if (success) {
-                        updatedCount++;
-                        debugInfo.append("  -> Password set to 5106\n");
-                    }
-                }
-            }
-            
-            debugInfo.append("\nUpdated ").append(updatedCount).append(" faculty with password 5106");
-            
-            redirectAttributes.addFlashAttribute("success", "Debug completed: " + debugInfo.toString());
-            logger.info("Debug setup completed. Updated {} faculty members.", updatedCount);
-        } catch (Exception e) {
-            logger.error("Error in debug setup", e);
-            redirectAttributes.addFlashAttribute("error", "Debug setup failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to reset password. Please try again.");
         }
         return "redirect:/faculty";
     }
 
 }
+
+
+

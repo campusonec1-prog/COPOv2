@@ -102,7 +102,7 @@ public class QuestionController {
             redirectAttributes.addFlashAttribute("success", "Questions saved successfully.");
         } catch (Exception e) {
             logger.error("Error saving questions: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Failed to save questions: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to save questions. Please try again.");
         }
 
         return "redirect:/questions";
@@ -123,7 +123,7 @@ public class QuestionController {
         return "questions/list";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteQuestion(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         logger.info("GET /questions/delete/{}", id);
         try {
@@ -131,7 +131,7 @@ public class QuestionController {
             redirectAttributes.addFlashAttribute("success", "Question deleted successfully.");
         } catch (Exception e) {
             logger.error("Error deleting question {}: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Failed to delete question: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to delete question. Please try again.");
         }
         return "redirect:/questions";
     }
@@ -182,7 +182,7 @@ public class QuestionController {
             redirectAttributes.addFlashAttribute("success", "Question updated successfully.");
         } catch (Exception e) {
             logger.error("Error updating question {}: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Failed to update question: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to update question. Please try again.");
         }
         return "redirect:/questions";
     }
@@ -217,8 +217,11 @@ public class QuestionController {
             redirectAttributes.addFlashAttribute("success", "Questions uploaded successfully.");
         } catch (Exception e) {
             logger.error("Error uploading questions from Excel: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Upload failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Upload failed. Please try again.");
         }
         return "redirect:/questions";
     }
 }
+
+
+

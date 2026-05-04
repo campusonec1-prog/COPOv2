@@ -1,5 +1,7 @@
 package com.copo.app.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,9 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/login")
 public class LoginController {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
+
 	@Autowired
 	LoginService loginService;
 	
@@ -64,7 +68,7 @@ public class LoginController {
                                Model model) {
     	Student student = loginService.validateStudent(rollNumber, dob);
     	
-    	System.out.println("Student details ==> "+student);
+    	log.debug("Student login attempt for roll number: {}", rollNumber);
         if (student != null) {
         	session.setAttribute("loggedInPerson", student.getName());
         	session.setAttribute("role", "student");
@@ -90,9 +94,9 @@ public class LoginController {
     	// Use only password-based authentication
     	Faculty faculty = loginService.validateFacultyWithPassword(facultycode, password);
     	
-    	System.out.println("login faculty "+faculty);
+    	log.debug("Faculty login attempt for code: {}", facultycode);
         if (faculty != null) {
-        	System.out.println("inside login faculty ");
+        	log.info("Faculty login successful: {}", facultycode);
         	session.setAttribute("loggedInPerson", faculty.getName());
         	session.setAttribute("role", "faculty");
         	session.setAttribute("loggedDetails", faculty);
@@ -106,3 +110,6 @@ public class LoginController {
         }
     }
 }
+
+
+

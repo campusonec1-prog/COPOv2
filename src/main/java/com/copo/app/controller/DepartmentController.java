@@ -36,7 +36,7 @@ public class DepartmentController {
             return "departments/list";
         } catch (Exception e) {
             logger.error("Failed to fetch department list", e);
-            model.addAttribute("errorMessage", "Failed to load department list." + e.getMessage());
+            model.addAttribute("errorMessage", "Failed to load department list.. Please try again.");
             return "departments/list";
         }
     }
@@ -60,7 +60,7 @@ public class DepartmentController {
             redirectAttributes.addFlashAttribute("successMessage", "Department added successfully.");
         } catch (Exception e) {
             logger.error("Failed to create department: {}", department.getName(), e.getMessage());
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred. Please try again.");
         }
         return "redirect:/departments";
     }
@@ -77,7 +77,7 @@ public class DepartmentController {
             return "departments/edit";
         } catch (Exception e) {
             logger.error("Error loading edit form for id {}", id, e);
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred. Please try again.");
             return "redirect:/departments";
         }
     }
@@ -96,13 +96,13 @@ public class DepartmentController {
             redirectAttributes.addFlashAttribute("successMessage", "Department updated successfully.");
         } catch (Exception e) {
             logger.error("Failed to update department with id: {}", id, e);
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred. Please try again.");
         }
         return "redirect:/departments";
     }
 
     // Delete a department
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteDepartment(@PathVariable Long id,
                                    RedirectAttributes redirectAttributes) {
         try {
@@ -129,3 +129,6 @@ public class DepartmentController {
     }
     
 }
+
+
+

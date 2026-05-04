@@ -80,7 +80,7 @@ public class BatchController {
             return "batches/edit";
         } catch (BatchNotFoundException e) {
             logger.warn(e.getMessage());
-            redirectAttributes.addAttribute("error", e.getMessage());
+            redirectAttributes.addAttribute("error", "An unexpected error occurred. Please try again.");
             return "redirect:/batches";
         } catch (Exception e) {
             logger.error("Error loading edit form for batch ID: {}", id, e);
@@ -107,7 +107,7 @@ public class BatchController {
             return "redirect:/batches";
         } catch (BatchNotFoundException e) {
             logger.error("Batch not found: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "An unexpected error occurred. Please try again.");
             return "redirect:/batches";
         } catch (Exception e) {
             logger.error("Error updating batch: {}", e.getMessage());
@@ -117,7 +117,7 @@ public class BatchController {
     }
 
     // Delete a batch
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteBatch(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             batchService.deleteBatch(id);
@@ -125,7 +125,7 @@ public class BatchController {
             logger.info("Batch deleted: ID={}", id);
         } catch (BatchNotFoundException e) {
             logger.warn(e.getMessage());
-            redirectAttributes.addAttribute("error", e.getMessage());
+            redirectAttributes.addAttribute("error", "An unexpected error occurred. Please try again.");
         } catch (Exception e) {
             logger.error("Error deleting batch ID: {}", id, e);
             redirectAttributes.addAttribute("error", "Failed to delete batch.");
@@ -133,3 +133,6 @@ public class BatchController {
         return "redirect:/batches";
     }
 }
+
+
+

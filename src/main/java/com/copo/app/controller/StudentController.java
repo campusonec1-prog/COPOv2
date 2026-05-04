@@ -35,6 +35,9 @@ public class StudentController {
     @Autowired
     private BatchService batchService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.registration.enabled:true}")
+    private boolean isRegistrationEnabled;
+
     // List all students
     @GetMapping("/students")
     public String getAllStudents(Model model) {
@@ -46,7 +49,7 @@ public class StudentController {
             return "students/list";
         } catch (Exception e) {
             logger.error("Error fetching student list", e);
-            model.addAttribute("error", "Unable to load student list. Error: " + e.getMessage());
+            model.addAttribute("error", "Unable to load student list..");
             return "error";
         }
     }
@@ -63,7 +66,7 @@ public class StudentController {
             return "login/studentdashboard";
         } catch (Exception e) {
             logger.error("Error loading student home", e);
-            model.addAttribute("error", "Unable to load dashboard. Error: " + e.getMessage());
+            model.addAttribute("error", "Unable to load dashboard..");
             return "error";
         }
     }
@@ -104,7 +107,7 @@ public class StudentController {
 
         } catch (Exception e) {
             logger.error("Error loading filtered students", e);
-            model.addAttribute("error", "Unable to load students. Error: " + e.getMessage());
+            model.addAttribute("error", "Unable to load students..");
             return Map.of("error", "Unable to filter students.");
         }
     }
@@ -132,7 +135,7 @@ public class StudentController {
             return "students/create";
         } catch (Exception e) {
             logger.error("Error displaying create student form", e);
-            model.addAttribute("error", "Unable to load form. Error: " + e.getMessage());
+            model.addAttribute("error", "Unable to load form..");
             return "error";
         }
     }
@@ -145,7 +148,7 @@ public class StudentController {
             redirectAttributes.addFlashAttribute("success", "Student created successfully!");
         } catch (Exception e) {
             logger.error("Error creating student", e);
-            redirectAttributes.addFlashAttribute("error", "Failed to create student. Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to create student..");
         }
         return "redirect:/students";
     }
@@ -164,7 +167,7 @@ public class StudentController {
             return "students/edit";
         } catch (Exception e) {
             logger.error("Error loading edit form for student ID: {}", id, e);
-            model.addAttribute("error", "Unable to load edit form. Error: " + e.getMessage());
+            model.addAttribute("error", "Unable to load edit form..");
             return "error";
         }
     }
@@ -177,27 +180,31 @@ public class StudentController {
             redirectAttributes.addFlashAttribute("success", "Student updated successfully!");
         } catch (Exception e) {
             logger.error("Error updating student with ID: {}", id, e);
-            redirectAttributes.addFlashAttribute("error", "Failed to update student. Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to update student..");
         }
         return "redirect:/students";
     }
 
     // Delete student
-    @GetMapping("/students/delete/{id}")
+    @PostMapping("/students/delete/{id}")
     public String deleteStudent(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             studentService.deleteStudent(id);
             redirectAttributes.addFlashAttribute("success", "Student deleted successfully!");
         } catch (Exception e) {
             logger.error("Error deleting student with ID: {}", id, e);
-            redirectAttributes.addFlashAttribute("error", "Failed to delete student. Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to delete student..");
         }
         return "redirect:/students";
     }
 
     // Public student registration - Show form
     @GetMapping("/register/student")
-    public String showPublicRegistrationForm(Model model) {
+    public String showPublicRegistrationForm(Model model, RedirectAttributes redirectAttributes) {
+        if (!isRegistrationEnabled) {
+            redirectAttributes.addFlashAttribute("error", "Student self-registration is disabled in this environment. Please contact administration.");
+            return "redirect:/login";
+        }
         try {
             model.addAttribute("student", new Student());
             model.addAttribute("departments", departmentService.getAllDepartments());
@@ -206,7 +213,7 @@ public class StudentController {
             return "register/student";
         } catch (Exception e) {
             logger.error("Error displaying public registration form", e);
-            model.addAttribute("error", "Unable to load registration form. Error: " + e.getMessage());
+            model.addAttribute("error", "Unable to load registration form..");
             return "register/student";
         }
     }
@@ -214,6 +221,10 @@ public class StudentController {
     // Public student registration - Process form
     @PostMapping("/register/student")
     public String processPublicRegistration(@ModelAttribute Student student, RedirectAttributes redirectAttributes) {
+        if (!isRegistrationEnabled) {
+            redirectAttributes.addFlashAttribute("error", "Student self-registration is disabled in this environment.");
+            return "redirect:/login";
+        }
         try {
             // Validate required fields
             if (student.getName() == null || student.getName().trim().isEmpty()) {
@@ -259,7 +270,7 @@ public class StudentController {
             return "redirect:/login";
         } catch (Exception e) {
             logger.error("Error processing public student registration", e);
-            redirectAttributes.addFlashAttribute("error", "Failed to register student. Error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to register student..");
             return "redirect:/register/student";
         }
     }
@@ -296,9 +307,12 @@ public class StudentController {
 
         } catch (Exception e) {
             logger.error("Error uploading student CSV", e);
-            redirectAttributes.addFlashAttribute("error", "Error uploading student data: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error uploading student data. Please try again.");
         }
         return "redirect:/students";
     }
 
 }
+
+
+

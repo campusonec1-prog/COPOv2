@@ -116,7 +116,7 @@ public class SubjectController {
             logger.info("Subject created: {}", subject.getName());
         } catch (Exception e) {
             logger.error("Error creating subject: {}", subject.getName(), e);
-            redirectAttributes.addFlashAttribute("error", "Failed to create subject: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to create subject. Please try again.");
         }
         return "redirect:/subjects";
     }
@@ -133,7 +133,7 @@ public class SubjectController {
             return "subjects/edit";
         } catch (Exception e) {
             logger.error("Error loading edit form for subject id={}", id, e);
-            redirectAttributes.addFlashAttribute("error", "Failed to load edit form: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to load edit form. Please try again.");
             return "redirect:/subjects";
         }
     }
@@ -147,13 +147,13 @@ public class SubjectController {
             logger.info("Subject updated: {}", subject.getName());
         } catch (Exception e) {
             logger.error("Error updating subject with id {}: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Failed to update subject: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to update subject. Please try again.");
         }
         return "redirect:/subjects";
     }
 
     // ✅ 9. Delete subject
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteSubject(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             subjectService.deleteSubject(id);
@@ -161,7 +161,7 @@ public class SubjectController {
             logger.info("Subject deleted with id: {}", id);
         } catch (Exception e) {
             logger.error("Error deleting subject with id {}: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Failed to delete subject: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Failed to delete subject. Please try again.");
         }
         return "redirect:/subjects";
     }
@@ -194,9 +194,12 @@ public class SubjectController {
                 logger.info("Subjects uploaded successfully via CSV");
             }
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Unexpected error: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Unexpected error. Please try again.");
             logger.error("Error during CSV upload", e);
         }
         return "redirect:/subjects";
     }
 }
+
+
+

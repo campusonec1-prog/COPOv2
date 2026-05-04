@@ -103,3 +103,20 @@
     </script>
 </body>
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('a[href*="/delete/"]').forEach(a => {
+        a.removeAttribute('onclick');
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm("Are you sure you want to delete? This action cannot be undone.")) {
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = this.getAttribute('href');
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+});
+</script>
